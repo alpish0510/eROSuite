@@ -1,3 +1,4 @@
 [submodule "cluster_dr"]
 	path = cluster_dr
 	url = https://github.com/alpish0510/eROSITA-data-reduction-scripts.git
+	branch = main

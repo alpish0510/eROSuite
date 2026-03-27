@@ -1,28 +1,26 @@
 import sys
 from PyQt6.QtWidgets import (
-    QApplication, QWidget, QPushButton,
-    QVBoxLayout, QLabel
+    QApplication, QMainWindow, QTabWidget, QWidget,
+    QPushButton, QVBoxLayout, QLabel
 )
 
 
 # -------------------------
-# Cluster Window
+# Galaxy Cluster Tab
 # -------------------------
-class ClusterWindow(QWidget):
+class ClusterTab(QWidget):
     def __init__(self):
         super().__init__()
-
-        self.setWindowTitle("Cluster Analysis")
 
         layout = QVBoxLayout()
 
         self.label = QLabel("Cluster analysis tools go here")
         self.run_btn = QPushButton("Run Analysis")
-
         self.run_btn.clicked.connect(self.run_analysis)
 
         layout.addWidget(self.label)
         layout.addWidget(self.run_btn)
+        layout.addStretch()
 
         self.setLayout(layout)
 
@@ -31,23 +29,21 @@ class ClusterWindow(QWidget):
 
 
 # -------------------------
-# SNR Window
+# SNR Tab
 # -------------------------
-class SNRWindow(QWidget):
+class SNRTab(QWidget):
     def __init__(self):
         super().__init__()
-
-        self.setWindowTitle("SNR Analysis")
 
         layout = QVBoxLayout()
 
         self.label = QLabel("SNR tools go here")
         self.run_btn = QPushButton("Compute SNR")
-
         self.run_btn.clicked.connect(self.compute_snr)
 
         layout.addWidget(self.label)
         layout.addWidget(self.run_btn)
+        layout.addStretch()
 
         self.setLayout(layout)
 
@@ -58,35 +54,18 @@ class SNRWindow(QWidget):
 # -------------------------
 # Main Window
 # -------------------------
-class MainWindow(QWidget):
+class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
         self.setWindowTitle("eROSuite")
+        self.resize(800, 600)
 
-        layout = QVBoxLayout()
+        tabs = QTabWidget()
+        tabs.addTab(ClusterTab(), "Galaxy Cluster Analysis")
+        tabs.addTab(SNRTab(), "Supernova Remnant Analysis")
 
-        self.cluster_btn = QPushButton("Cluster Analysis")
-        self.snr_btn = QPushButton("SNR Analysis")
-
-        layout.addWidget(self.cluster_btn)
-        layout.addWidget(self.snr_btn)
-
-        self.setLayout(layout)
-
-        # Create child windows (important: keep references!)
-        self.cluster_window = ClusterWindow()
-        self.snr_window = SNRWindow()
-
-        # Connect buttons
-        self.cluster_btn.clicked.connect(self.open_cluster)
-        self.snr_btn.clicked.connect(self.open_snr)
-
-    def open_cluster(self):
-        self.cluster_window.show()
-
-    def open_snr(self):
-        self.snr_window.show()
+        self.setCentralWidget(tabs)
 
 
 # -------------------------

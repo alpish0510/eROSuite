@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.DS_Store
+# *.fits
+# *.fits.gz
+*.png
+*.log
+Data/Filtered/
+Data/Merged/

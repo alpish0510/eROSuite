@@ -1,0 +1,5 @@
+{
+  "_comment": "Custom profile — edit 'steps' to include any subset of step IDs from steps_registry.json.",
+  "name": "Custom",
+  "steps": ["1.1", "1.3"]
+}

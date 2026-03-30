@@ -1,0 +1,159 @@
+{
+  "_comment": "Master registry of every pipeline step. 'compulsory': true means the step cannot be skipped.",
+
+  "1.1": {
+    "title": "Initialisation",
+    "script": "data_reduction/s01_initialise.py",
+    "compulsory": true,
+    "description": "Set up directories and define processing parameters.\nLocates raw event files and prepares output folder structure (Lightcurves/, Merged/). Runs evtool to create clean event files and writes file lists for downstream steps.",
+    "output": {
+      "type": "single_image",
+      "dir_arg": "output_dir",
+      "filename": "tile_map.png",
+      "label": "Input tiles on eRASS DR1 skymap"
+    },
+    "args": [
+      {
+        "name": "input_dir",
+        "label": "Input Directory",
+        "type": "path_dir",
+        "default": "Data/Raw_data",
+        "required": true,
+        "positional": true,
+        "help": "Directory containing raw eROSITA event files (Raw_data/)"
+      },
+      {
+        "name": "output_dir",
+        "label": "Output Directory",
+        "type": "path_dir",
+        "default": "Data/Filtered",
+        "required": true,
+        "positional": true,
+        "help": "Directory where processed/filtered data will be written"
+      },
+      {
+        "name": "tile_map",
+        "label": "Generate Tile Footprint Map",
+        "type": "bool",
+        "default": true,
+        "required": false,
+        "positional": false,
+        "flag": "--no_tile_map",
+        "flag_inverted": true,
+        "help": "Generate input tiles footprint image on eRASS DR1 skymap (tile_map.png)"
+      }
+    ]
+  },
+
+  "1.2": {
+    "title": "Flare Filtering",
+    "script": "data_reduction/s02_flare_filter.py",
+    "compulsory": false,
+    "description": "Reads file lists written by Step 1.1. & Extracts lightcurves with flaregti, fits a Gaussian to the count-rate distribution, applies 3\u03c3 sigma-clipping, and re-runs evtool with the derived GTI threshold.\n-Optionally produces diagnostic plots and/or a proof-check pass.",
+    "output": {
+      "type": "side_by_side",
+      "panels": [
+        {
+          "label": "Lightcurves",
+          "dir_arg": "output_dir",
+          "subdir": "Lightcurves",
+          "glob": "*.png"
+        },
+        {
+          "label": "Proof Check",
+          "dir_arg": "output_dir",
+          "subdir": "Lightcurves/Proof_check",
+          "glob": "*.png",
+          "condition_arg": "ff_proof"
+        }
+      ]
+    },
+    "args": [
+      {
+        "name": "output_dir",
+        "label": "Output Directory",
+        "type": "path_dir",
+        "default": "Data/Filtered",
+        "required": true,
+        "positional": true,
+        "help": "Same output directory used in Step 1.1"
+      },
+      {
+        "name": "timebin",
+        "label": "Time Bin Size (s)",
+        "type": "int",
+        "default": "20",
+        "required": true,
+        "positional": true,
+        "help": "Bin size in seconds used for lightcurve extraction (default: 20)"
+      },
+      {
+        "name": "ff_plots",
+        "label": "Create Flare Filtering Plots",
+        "type": "bool",
+        "default": true,
+        "required": false,
+        "positional": false,
+        "flag": "--ff_plots",
+        "help": "Save diagnostic plots for each tile's lightcurve and Gaussian fit"
+      },
+      {
+        "name": "ff_proof",
+        "label": "Proof-Check Flare Filtering",
+        "type": "bool",
+        "default": false,
+        "required": false,
+        "positional": false,
+        "flag": "--ff_proof",
+        "help": "Run an additional proof-check pass after filtering"
+      }
+    ]
+  },
+
+  "1.3": {
+    "title": "Merging",
+    "script": "data_reduction/s03_merge.py",
+    "compulsory": true,
+    "description": "Combines tile event lists into a single merged file and runs radec2xy. Uses flare-filtered lists from Step 1.2 when available; falls back to clean event lists from Step 1.1 if Step 1.2 was skipped.\n-Optionally splits the merged list by Telescope Module (TM 1\u20139).",
+    "output": null,
+    "args": [
+      {
+        "name": "output_dir",
+        "label": "Output Directory",
+        "type": "path_dir",
+        "default": "Data/Filtered",
+        "required": true,
+        "positional": true,
+        "help": "Same output directory used in Step 1.1"
+      },
+      {
+        "name": "center_ra",
+        "label": "Center RA (deg)",
+        "type": "float",
+        "default": "",
+        "required": true,
+        "positional": true,
+        "help": "Right ascension of the image center in degrees"
+      },
+      {
+        "name": "center_dec",
+        "label": "Center Dec (deg)",
+        "type": "float",
+        "default": "",
+        "required": true,
+        "positional": true,
+        "help": "Declination of the image center in degrees"
+      },
+      {
+        "name": "separate_tm",
+        "label": "Separate by Telescope Module",
+        "type": "bool",
+        "default": false,
+        "required": false,
+        "positional": false,
+        "flag": "--separate_tm",
+        "help": "Split merged event list into per-TM files (TM 1\u20139)"
+      }
+    ]
+  }
+}
